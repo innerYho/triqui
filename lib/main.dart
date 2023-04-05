@@ -42,6 +42,21 @@ class _GameScreenState extends State<GameScreen> {
   String lastValue = 'X';
   bool gameOver = false;
   int turn = 0; //number of turn
+
+  String result = "";
+
+  List<int> scoreboard = [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ]; //the score are the different combination of the game
+//[Row 1,2,3 col 1,2,3 Diagonal 1,2,3]
+
   // Game components
   Game game = Game();
   // init the gameBoard
@@ -62,7 +77,7 @@ class _GameScreenState extends State<GameScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              "It's $lastValue turn".toUpperCase(),
+              lastValue,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 58,
@@ -71,7 +86,7 @@ class _GameScreenState extends State<GameScreen> {
             const SizedBox(
               height: 20.0,
             ),
-            Container(
+            SizedBox(
               //game board
               width: boardWidth,
               height: boardWidth,
@@ -91,7 +106,16 @@ class _GameScreenState extends State<GameScreen> {
                             if (game.board![index] == '') {
                               setState(() {
                                 game.board![index] = lastValue;
-                                //we need also to toggle the player
+                                turn++;
+                                gameOver = game.winnerCheck(
+                                    lastValue, index, scoreboard, 3);
+                                if (gameOver) {
+                                  result = "$lastValue es el ganador";
+                                } else if (!gameOver && turn == 9) {
+                                  result = "Es un empate";
+                                  gameOver = true;
+                                }
+
                                 if (lastValue == 'X') {
                                   lastValue = 'O';
                                 } else {
@@ -122,11 +146,20 @@ class _GameScreenState extends State<GameScreen> {
                 }),
               ),
             ),
+            SizedBox(height: 25.0),
+            Text(
+              result,
+              style: TextStyle(color: Colors.white, fontSize: 54.0),
+            ),
             ElevatedButton.icon(
               onPressed: () {
                 setState(() {
                   game.board = Game.initGameBoard();
                   lastValue = 'X';
+                  gameOver = false;
+                  turn = 0;
+                  result = '';
+                  scoreboard = [0, 0, 0, 0, 0, 0, 0, 0];
                 });
               },
               icon: const Icon(Icons.replay),
